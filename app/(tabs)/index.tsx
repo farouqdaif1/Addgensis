@@ -6,30 +6,56 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Link } from "expo-router";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import * as MediaLibrary from "expo-media-library";
+import { useDispatch } from "react-redux";
+import { addPhoto } from "../../store/photoSlice";
 
-export default function Index() {
+export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
   const [flashMode, setFlashMode] = useState<"on" | "off">("off");
   const [photoUri, setPhotoUri] = useState<string | null>(null);
-  const cameraRef = useRef<CameraView>(null); // Ref to access the CameraView instance
+  const [mediaLibraryPermission, setMediaLibraryPermission] = useState<
+    boolean | null
+  >(null);
+  const cameraRef = useRef<CameraView>(null);
+  const dispatch = useDispatch(); // Get the dispatch function from Redux
+
+  // Request media library permissions
+  useEffect(() => {
+    (async () => {
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      setMediaLibraryPermission(status === "granted");
+    })();
+  }, []);
 
   if (!permission) {
-    // Camera permissions are still loading.
     return <View />;
   }
 
   if (!permission.granted) {
-    // Camera permissions are not granted yet.
     return (
       <View style={styles.container}>
         <Text style={styles.message}>
           We need your permission to show the camera
         </Text>
         <Button onPress={requestPermission} title="grant permission" />
+      </View>
+    );
+  }
+
+  if (mediaLibraryPermission === null) {
+    return <View />;
+  }
+
+  if (!mediaLibraryPermission) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.message}>
+          We need your permission to save photos to the gallery
+        </Text>
       </View>
     );
   }
@@ -41,23 +67,29 @@ export default function Index() {
   function toggleFlash() {
     setFlashMode((current) => (current === "off" ? "on" : "off"));
   }
+
   async function takePicture() {
     if (cameraRef.current) {
       try {
         const photo = await cameraRef.current.takePictureAsync();
-        console.log("Photo taken:", photo); // Log the photo object
+        console.log("Photo taken:", photo);
         if (photo) {
-          setPhotoUri(photo.uri); // Save the photo URI to state
+          setPhotoUri(photo.uri);
+          dispatch(addPhoto(photo.uri)); // Dispatch the addPhoto action
+
+          // Save the photo to the device's gallery
+          await MediaLibrary.saveToLibraryAsync(photo.uri);
         }
       } catch (error) {
         console.error("Failed to take picture:", error);
       }
     }
   }
+
   return (
     <View style={styles.container}>
       <CameraView
-        ref={cameraRef} // Attach the ref to CameraView
+        ref={cameraRef}
         style={styles.camera}
         facing={facing}
         enableTorch={flashMode === "on"}
@@ -80,16 +112,13 @@ export default function Index() {
           </TouchableOpacity>
         </View>
       </CameraView>
+
       {photoUri && (
         <View style={styles.previewContainer}>
           <Text style={styles.text}>Photo Preview:</Text>
           <Image source={{ uri: photoUri }} style={styles.previewImage} />
         </View>
       )}
-      <Text style={styles.text}>Camera screen</Text>
-      <Link href="/gallery" style={styles.button}>
-        Go to Gallery screen
-      </Link>
     </View>
   );
 }
@@ -114,7 +143,7 @@ const styles = StyleSheet.create({
     padding: 1,
     backgroundColor: "#1e1e1e",
     borderRadius: 5,
-    marginHorizontal: 5, // Add some spacing between buttons
+    marginHorizontal: 5,
   },
   message: {
     textAlign: "center",
@@ -129,8 +158,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "transparent",
     margin: 64,
-    alignItems: "flex-end", // Align buttons to the bottom
-    justifyContent: "center", // Center buttons horizontally
+    alignItems: "flex-end",
+    justifyContent: "center",
   },
   previewContainer: {
     marginTop: 20,
