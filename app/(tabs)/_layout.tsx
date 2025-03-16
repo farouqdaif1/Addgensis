@@ -32,12 +32,25 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="gallery"
+          name="post"
           options={{
-            title: "Gallery",
+            title: "New Post",
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
-                name={focused ? "images-sharp" : "images-outline"}
+                name={focused ? "add-circle" : "add-circle-outline"}
+                color={color}
+                size={24}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="posts"
+          options={{
+            title: "My Posts",
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? "grid-sharp" : "grid-outline"}
                 color={color}
                 size={24}
               />

@@ -1,50 +1,59 @@
-# Welcome to your Expo app 👋
+# Instagram-like Camera App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile app built with Expo and React Native that allows users to take photos with the device camera, save images to the mobile gallery, and create posts with one or more images.
 
-## Get started
+## Features
 
-1. Install dependencies
+- Camera functionality to take photos
+- Automatic saving of photos to the device gallery
+- Create posts with single or multiple images
+- Pick images from the device's gallery
+- View all your posts in an Instagram-like feed
 
-   ```bash
-   npm install
-   ```
+## Installation
 
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+1. Make sure you have Node.js and npm/yarn installed
+2. Install Expo CLI globally:
+```
+npm install -g expo-cli
+```
+3. Clone this repository
+4. Install the dependencies:
+```
+npm install
+```
+5. Run the app:
+```
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Dependencies
 
-## Learn more
+This app requires the following dependencies:
 
-To learn more about developing your project with Expo, look at the following resources:
+```
+expo-camera
+expo-media-library
+expo-image-picker
+expo-router
+@reduxjs/toolkit
+react-redux
+@expo/vector-icons
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+To install them, run:
 
-## Join the community
+```
+npx expo install expo-camera expo-media-library expo-image-picker expo-router @reduxjs/toolkit react-redux @expo/vector-icons
+```
 
-Join our community of developers creating universal apps.
+## How to Use
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. Open the app
+2. Use the Camera tab to take photos
+3. Photos are automatically saved to your device gallery
+4. Use the New Post tab to create a post
+   - Select images from your device gallery
+   - Add a caption
+   - Share your post
+5. View all your posts in the My Posts tab

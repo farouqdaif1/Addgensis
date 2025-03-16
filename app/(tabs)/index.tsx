@@ -10,7 +10,8 @@ import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import { useState, useRef, useEffect } from "react";
 import * as MediaLibrary from "expo-media-library";
 import { useDispatch } from "react-redux";
-import { addPhoto } from "../../store/photoSlice";
+import { setRecentPhoto } from "../../store/photoSlice";
+import { router } from "expo-router";
 
 export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
@@ -75,7 +76,7 @@ export default function CameraScreen() {
         console.log("Photo taken:", photo);
         if (photo) {
           setPhotoUri(photo.uri);
-          dispatch(addPhoto(photo.uri)); // Dispatch the addPhoto action
+          dispatch(setRecentPhoto(photo.uri)); // Store the most recent photo
 
           // Save the photo to the device's gallery
           await MediaLibrary.saveToLibraryAsync(photo.uri);
@@ -85,6 +86,12 @@ export default function CameraScreen() {
       }
     }
   }
+
+  const handleCreatePost = () => {
+    if (photoUri) {
+      router.push("/(tabs)/post");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -117,6 +124,12 @@ export default function CameraScreen() {
         <View style={styles.previewContainer}>
           <Text style={styles.text}>Photo Preview:</Text>
           <Image source={{ uri: photoUri }} style={styles.previewImage} />
+          <TouchableOpacity
+            style={styles.postButton}
+            onPress={handleCreatePost}
+          >
+            <Text style={styles.postButtonText}>Create Post</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -162,13 +175,31 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   previewContainer: {
-    marginTop: 20,
+    width: "100%",
+    padding: 20,
+    backgroundColor: "#1e1e1e",
+    flexDirection: "column",
     alignItems: "center",
   },
   previewImage: {
-    width: 200,
-    height: 200,
+    width: 150,
+    height: 150,
     borderRadius: 10,
     marginTop: 10,
+    marginBottom: 20,
+  },
+  postButton: {
+    backgroundColor: "#ffd33d",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginTop: 10,
+    width: "80%",
+    alignItems: "center",
+  },
+  postButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#25292e",
   },
 });
