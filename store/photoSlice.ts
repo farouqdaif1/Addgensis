@@ -1,49 +1,51 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface Post {
     id: string;
+    name: string;
+    description: string;
+    price: number;
     images: string[];
-    caption?: string;
-    createdAt: number;
+    createdAt: string;
 }
 
 interface PhotoState {
-    recentPhoto: string | null; // Store the most recent photo taken with camera
-    posts: Post[]; // Array to store posts
+    posts: Post[];
+    loading: boolean;
+    error: string | null;
+    recentPhoto: string | null;
 }
 
 const initialState: PhotoState = {
-    recentPhoto: null, // Store the most recent photo taken with camera
-    posts: [], // Array to store posts
+    posts: [],
+    loading: false,
+    error: null,
+    recentPhoto: null,
 };
 
 const photoSlice = createSlice({
     name: "photos",
     initialState,
     reducers: {
-        setRecentPhoto: (state, action) => {
-            state.recentPhoto = action.payload; // Set the most recent photo URI
+        addPost: (state, action: PayloadAction<Post>) => {
+            state.posts.push(action.payload);
         },
-        createPost: (state, action) => {
-            const { images, caption } = action.payload;
-            const newPost = {
-                id: Date.now().toString(),
-                images,
-                caption,
-                createdAt: Date.now(),
-            };
-            state.posts.push(newPost);
-        },
-        deletePost: (state, action) => {
+        createFacebookAd: (state, action: PayloadAction<string>) => {
             const postId = action.payload;
-            state.posts = state.posts.filter(post => post.id !== postId);
+            console.log(`Creating Facebook ad for post: ${postId}`);
+        },
+        enhanceWithAI: (state, action: PayloadAction<string>) => {
+            const postId = action.payload;
+            console.log(`Enhancing post with AI: ${postId}`);
+        },
+        setRecentPhoto: (state, action: PayloadAction<string | null>) => {
+            state.recentPhoto = action.payload;
+        },
+        deletePost: (state, action: PayloadAction<string>) => {
+            state.posts = state.posts.filter(post => post.id !== action.payload);
         },
     },
 });
 
-export const {
-    setRecentPhoto,
-    createPost,
-    deletePost
-} = photoSlice.actions;
+export const { addPost, createFacebookAd, enhanceWithAI, setRecentPhoto, deletePost } = photoSlice.actions;
 export default photoSlice.reducer;

@@ -11,7 +11,7 @@ import {
   Platform,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { createPost } from "../../store/photoSlice";
+import { addPost } from "../../store/photoSlice";
 import { router } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
@@ -24,6 +24,9 @@ export default function PostScreen() {
   );
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [caption, setCaption] = useState("");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
 
   // When the screen loads, if there's a recent photo from the camera, add it to selected images
   useEffect(() => {
@@ -53,8 +56,7 @@ export default function PostScreen() {
     });
 
     if (!result.canceled) {
-      const newImages = result.assets.map((asset) => asset.uri);
-      setSelectedImages((current) => [...current, ...newImages]);
+      setSelectedImages(result.assets.map((asset) => asset.uri));
     }
   };
 
@@ -62,7 +64,7 @@ export default function PostScreen() {
     setSelectedImages((current) => current.filter((img) => img !== uri));
   };
 
-  const handleCreatePost = () => {
+  const handleSubmit = () => {
     if (selectedImages.length === 0) {
       Alert.alert(
         "No Images Selected",
@@ -71,7 +73,22 @@ export default function PostScreen() {
       return;
     }
 
-    dispatch(createPost({ images: selectedImages, caption }));
+    if (!name.trim()) {
+      Alert.alert("Please enter a name for your post");
+      return;
+    }
+
+    dispatch(
+      addPost({
+        id: Date.now().toString(),
+        name,
+        description,
+        price: price ? parseFloat(price) : 0,
+        images: selectedImages,
+        createdAt: new Date().toISOString(),
+      })
+    );
+
     Alert.alert("Success", "Your post has been created!", [
       {
         text: "OK",
@@ -80,50 +97,92 @@ export default function PostScreen() {
           // Clear state
           setSelectedImages([]);
           setCaption("");
+          setName("");
+          setDescription("");
+          setPrice("");
         },
       },
     ]);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create Post</Text>
+    <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Create New Post</Text>
+        <Ionicons name="create-outline" size={24} color="#ffd33d" />
+      </View>
 
-      <ScrollView horizontal style={styles.previewScroll}>
-        {selectedImages.map((uri, index) => (
-          <View key={index} style={styles.imageWrapper}>
-            <Image source={{ uri }} style={styles.previewImage} />
-            <TouchableOpacity
-              style={styles.removeButton}
-              onPress={() => removeImage(uri)}
-            >
-              <Ionicons name="close-circle" size={24} color="#ff6b6b" />
-            </TouchableOpacity>
+      <View style={styles.formContainer}>
+        <Text style={styles.label}>Name</Text>
+        <TextInput
+          style={[styles.input, { color: "#ffffff" }]}
+          value={name}
+          onChangeText={setName}
+          placeholder="Enter post name"
+          placeholderTextColor="#8a8a8a"
+          selectionColor="#ffd33d"
+        />
+
+        <Text style={styles.label}>Description</Text>
+        <TextInput
+          style={[styles.input, styles.textArea, { color: "#ffffff" }]}
+          value={description}
+          onChangeText={setDescription}
+          placeholder="Enter description"
+          placeholderTextColor="#8a8a8a"
+          multiline
+          numberOfLines={4}
+          selectionColor="#ffd33d"
+        />
+
+        <Text style={styles.label}>Price</Text>
+        <TextInput
+          style={[styles.input, { color: "#ffffff" }]}
+          value={price}
+          onChangeText={setPrice}
+          placeholder="Enter price"
+          placeholderTextColor="#8a8a8a"
+          keyboardType="numeric"
+          selectionColor="#ffd33d"
+        />
+
+        <View style={styles.imageSelectionContainer}>
+          <TouchableOpacity
+            style={styles.imagePickerButton}
+            onPress={pickImage}
+          >
+            <Ionicons name="images-outline" size={20} color="#25292e" />
+            <Text style={styles.buttonText}>Select Images</Text>
+          </TouchableOpacity>
+        </View>
+
+        {selectedImages.length > 0 && (
+          <View style={styles.imagePreviewContainer}>
+            <Text style={styles.previewText}>
+              Selected Images ({selectedImages.length})
+            </Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {selectedImages.map((uri, index) => (
+                <View key={index} style={styles.imageWrapper}>
+                  <Image source={{ uri }} style={styles.imagePreview} />
+                  <TouchableOpacity
+                    style={styles.removeImageButton}
+                    onPress={() => removeImage(uri)}
+                  >
+                    <Ionicons name="close-circle" size={22} color="#ff3b30" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
           </View>
-        ))}
-        <TouchableOpacity style={styles.addImageButton} onPress={pickImage}>
-          <Ionicons name="add-circle" size={40} color="#ffd33d" />
-          <Text style={styles.addImageText}>Add Photos</Text>
+        )}
+
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitButtonText}>Create Post</Text>
+          <Ionicons name="checkmark-circle-outline" size={20} color="#25292e" />
         </TouchableOpacity>
-      </ScrollView>
-
-      <TextInput
-        style={styles.captionInput}
-        placeholder="Write a caption for your post..."
-        placeholderTextColor="#aaa"
-        value={caption}
-        onChangeText={setCaption}
-        multiline
-      />
-
-      <TouchableOpacity
-        style={styles.postButton}
-        onPress={handleCreatePost}
-        disabled={selectedImages.length === 0}
-      >
-        <Text style={styles.postButtonText}>Share</Text>
-      </TouchableOpacity>
-    </View>
+      </View>
+    </ScrollView>
   );
 }
 
@@ -131,66 +190,101 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#25292e",
-    padding: 20,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#353840",
   },
   title: {
     fontSize: 24,
-    color: "#fff",
+    fontWeight: "bold",
+    color: "#ffffff",
+  },
+  formContainer: {
+    padding: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#ffffff",
+    marginBottom: 8,
+    marginTop: 16,
+  },
+  input: {
+    backgroundColor: "#353840",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 8,
+    borderWidth: 0,
+  },
+  textArea: {
+    height: 120,
+    textAlignVertical: "top",
+  },
+  imageSelectionContainer: {
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  imagePickerButton: {
+    backgroundColor: "#ffd33d",
+    padding: 14,
+    borderRadius: 8,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#25292e",
+    fontWeight: "600",
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  imagePreviewContainer: {
+    marginTop: 15,
     marginBottom: 20,
   },
-  previewScroll: {
-    marginBottom: 20,
-    maxHeight: 200,
+  previewText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "500",
+    marginBottom: 10,
   },
   imageWrapper: {
     position: "relative",
-    marginRight: 10,
+    marginRight: 12,
   },
-  previewImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 8,
-  },
-  removeButton: {
-    position: "absolute",
-    top: 5,
-    right: 5,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    borderRadius: 12,
-  },
-  addImageButton: {
-    width: 150,
-    height: 150,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#aaa",
-    borderStyle: "dashed",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  addImageText: {
-    color: "#ffd33d",
-    marginTop: 5,
-  },
-  captionInput: {
-    backgroundColor: "#353840",
-    borderRadius: 10,
-    padding: 15,
-    color: "#fff",
-    fontSize: 16,
+  imagePreview: {
+    width: 120,
     height: 120,
-    textAlignVertical: "top",
-    marginBottom: 20,
+    borderRadius: 10,
   },
-  postButton: {
+  removeImageButton: {
+    position: "absolute",
+    top: -10,
+    right: -10,
+    backgroundColor: "#25292e",
+    borderRadius: 15,
+    padding: 2,
+  },
+  submitButton: {
     backgroundColor: "#ffd33d",
-    paddingVertical: 15,
+    padding: 16,
     borderRadius: 8,
+    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
+    marginTop: 20,
   },
-  postButtonText: {
-    fontSize: 16,
-    fontWeight: "bold",
+  submitButtonText: {
     color: "#25292e",
+    fontWeight: "bold",
+    fontSize: 18,
+    marginRight: 8,
   },
 });
