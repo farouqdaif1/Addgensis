@@ -12,6 +12,7 @@ import * as MediaLibrary from "expo-media-library";
 import { useDispatch } from "react-redux";
 import { setRecentPhoto } from "../../store/photoSlice";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
@@ -93,43 +94,83 @@ export default function CameraScreen() {
     }
   };
 
+  const handleRetake = () => {
+    setPhotoUri(null);
+  };
+
   return (
     <View style={styles.container}>
-      <CameraView
-        ref={cameraRef}
-        style={styles.camera}
-        facing={facing}
-        enableTorch={flashMode === "on"}
-        flash={flashMode}
-      >
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.touchable}
-            onPress={toggleCameraFacing}
-          >
-            <Text style={styles.button}>Flip Camera</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.touchable} onPress={toggleFlash}>
-            <Text style={styles.button}>
-              {flashMode === "off" ? "Flash On" : "Flash Off"}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.touchable} onPress={takePicture}>
-            <Text style={styles.button}>Take Picture</Text>
-          </TouchableOpacity>
-        </View>
-      </CameraView>
+      {!photoUri ? (
+        <CameraView
+          ref={cameraRef}
+          style={styles.camera}
+          facing={facing}
+          enableTorch={flashMode === "on"}
+          flash={flashMode}
+        >
+          <View style={styles.cameraHeader}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={toggleCameraFacing}
+            >
+              <Ionicons name="camera-reverse" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton} onPress={toggleFlash}>
+              <Ionicons
+                name={flashMode === "off" ? "flash-off" : "flash"}
+                size={24}
+                color="#FFFFFF"
+              />
+            </TouchableOpacity>
+          </View>
 
-      {photoUri && (
-        <View style={styles.previewContainer}>
-          <Text style={styles.text}>Photo Preview:</Text>
-          <Image source={{ uri: photoUri }} style={styles.previewImage} />
-          <TouchableOpacity
-            style={styles.postButton}
-            onPress={handleCreatePost}
-          >
-            <Text style={styles.postButtonText}>Create Post</Text>
-          </TouchableOpacity>
+          <View style={styles.captureContainer}>
+            <TouchableOpacity
+              style={styles.captureButton}
+              onPress={takePicture}
+            >
+              <View style={styles.captureButtonInner} />
+            </TouchableOpacity>
+          </View>
+        </CameraView>
+      ) : (
+        <View style={styles.previewWrapper}>
+          <View style={styles.previewHeader}>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={handleRetake}
+            >
+              <Ionicons name="arrow-back" size={24} color="#1E293B" />
+            </TouchableOpacity>
+            <Text style={styles.previewTitle}>Preview</Text>
+            <View style={{ width: 40 }} />
+          </View>
+
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: photoUri }} style={styles.previewImage} />
+          </View>
+
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={[styles.actionButton, styles.retakeButton]}
+              onPress={handleRetake}
+            >
+              <Ionicons name="camera-outline" size={20} color="#2563EB" />
+              <Text style={styles.retakeButtonText}>Retake</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.actionButton, styles.useButton]}
+              onPress={handleCreatePost}
+            >
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={20}
+                color="#FFFFFF"
+              />
+              <Text style={styles.useButtonText}>Use Photo</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
     </View>
@@ -139,67 +180,119 @@ export default function CameraScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#25292e",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  text: {
-    color: "#fff",
-  },
-  button: {
-    fontSize: 20,
-    textDecorationLine: "underline",
-    color: "#fff",
-  },
-  touchable: {
-    height: 40,
-    padding: 1,
-    backgroundColor: "#1e1e1e",
-    borderRadius: 5,
-    marginHorizontal: 5,
-  },
-  message: {
-    textAlign: "center",
-    paddingBottom: 10,
+    backgroundColor: "#000000",
   },
   camera: {
     flex: 1,
     width: "100%",
   },
-  buttonContainer: {
-    flex: 1,
+  cameraHeader: {
     flexDirection: "row",
-    backgroundColor: "transparent",
-    margin: 64,
-    alignItems: "flex-end",
-    justifyContent: "center",
-  },
-  previewContainer: {
-    width: "100%",
+    justifyContent: "space-between",
     padding: 20,
-    backgroundColor: "#1e1e1e",
-    flexDirection: "column",
+    paddingTop: 60,
+  },
+  captureContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingBottom: 40,
+  },
+  iconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  captureButton: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 4,
+    borderColor: "#2563EB",
+  },
+  captureButtonInner: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: "#2563EB",
+  },
+  previewWrapper: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+  previewHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingTop: 60,
+    paddingBottom: 16,
+    backgroundColor: "#FFFFFF",
+  },
+  headerButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F1F5F9",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  previewTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#1E293B",
+  },
+  imageContainer: {
+    flex: 1,
+    backgroundColor: "#000000",
+    justifyContent: "center",
     alignItems: "center",
   },
   previewImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 10,
-    marginTop: 10,
-    marginBottom: 20,
+    width: "100%",
+    height: "100%",
+    resizeMode: "contain",
   },
-  postButton: {
-    backgroundColor: "#ffd33d",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginTop: 10,
-    width: "80%",
+  actionButtons: {
+    flexDirection: "row",
+    padding: 16,
+    gap: 12,
+    backgroundColor: "#FFFFFF",
+  },
+  actionButton: {
+    flex: 1,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+    borderRadius: 12,
+    gap: 8,
   },
-  postButtonText: {
+  retakeButton: {
+    backgroundColor: "#F1F5F9",
+  },
+  useButton: {
+    backgroundColor: "#2563EB",
+  },
+  retakeButtonText: {
     fontSize: 16,
-    fontWeight: "bold",
-    color: "#25292e",
+    fontWeight: "600",
+    color: "#2563EB",
+  },
+  useButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+  message: {
+    textAlign: "center",
+    paddingBottom: 10,
+    color: "#1E293B",
   },
 });

@@ -108,42 +108,42 @@ export default function PostScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Create New Post</Text>
-        <Ionicons name="create-outline" size={24} color="#ffd33d" />
+        <Text style={styles.title}>Create New Ad</Text>
+        <Ionicons name="megaphone-outline" size={24} color="#2563EB" />
       </View>
 
       <View style={styles.formContainer}>
-        <Text style={styles.label}>Name</Text>
+        <Text style={styles.label}>Ad Title</Text>
         <TextInput
-          style={[styles.input, { color: "#ffffff" }]}
+          style={styles.input}
           value={name}
           onChangeText={setName}
-          placeholder="Enter post name"
-          placeholderTextColor="#8a8a8a"
-          selectionColor="#ffd33d"
+          placeholder="Enter ad title"
+          placeholderTextColor="#94A3B8"
+          selectionColor="#2563EB"
         />
 
-        <Text style={styles.label}>Description</Text>
+        <Text style={styles.label}>Ad Description</Text>
         <TextInput
-          style={[styles.input, styles.textArea, { color: "#ffffff" }]}
+          style={[styles.input, styles.textArea]}
           value={description}
           onChangeText={setDescription}
-          placeholder="Enter description"
-          placeholderTextColor="#8a8a8a"
+          placeholder="Enter ad description"
+          placeholderTextColor="#94A3B8"
           multiline
           numberOfLines={4}
-          selectionColor="#ffd33d"
+          selectionColor="#2563EB"
         />
 
         <Text style={styles.label}>Price</Text>
         <TextInput
-          style={[styles.input, { color: "#ffffff" }]}
+          style={styles.input}
           value={price}
           onChangeText={setPrice}
           placeholder="Enter price"
-          placeholderTextColor="#8a8a8a"
+          placeholderTextColor="#94A3B8"
           keyboardType="numeric"
-          selectionColor="#ffd33d"
+          selectionColor="#2563EB"
         />
 
         <View style={styles.imageSelectionContainer}>
@@ -151,26 +151,46 @@ export default function PostScreen() {
             style={styles.imagePickerButton}
             onPress={pickImage}
           >
-            <Ionicons name="images-outline" size={20} color="#25292e" />
+            <Ionicons name="images-outline" size={20} color="#FFFFFF" />
             <Text style={styles.buttonText}>Select Images</Text>
           </TouchableOpacity>
         </View>
 
         {selectedImages.length > 0 && (
           <View style={styles.imagePreviewContainer}>
-            <Text style={styles.previewText}>
-              Selected Images ({selectedImages.length})
-            </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.previewHeader}>
+              <Text style={styles.previewText}>
+                Selected Images ({selectedImages.length})
+              </Text>
+              <TouchableOpacity
+                style={styles.addMoreButton}
+                onPress={pickImage}
+              >
+                <Ionicons name="add" size={20} color="#2563EB" />
+                <Text style={styles.addMoreText}>Add More</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.imageScrollContainer}
+              decelerationRate="fast"
+              snapToInterval={140}
+            >
               {selectedImages.map((uri, index) => (
                 <View key={index} style={styles.imageWrapper}>
                   <Image source={{ uri }} style={styles.imagePreview} />
-                  <TouchableOpacity
-                    style={styles.removeImageButton}
-                    onPress={() => removeImage(uri)}
-                  >
-                    <Ionicons name="close-circle" size={22} color="#ff3b30" />
-                  </TouchableOpacity>
+                  <View style={styles.imageOverlay}>
+                    <TouchableOpacity
+                      style={styles.removeImageButton}
+                      onPress={() => removeImage(uri)}
+                    >
+                      <Ionicons name="close-circle" size={24} color="#EF4444" />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.imageNumber}>
+                    <Text style={styles.imageNumberText}>{index + 1}</Text>
+                  </View>
                 </View>
               ))}
             </ScrollView>
@@ -178,8 +198,8 @@ export default function PostScreen() {
         )}
 
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.submitButtonText}>Create Post</Text>
-          <Ionicons name="checkmark-circle-outline" size={20} color="#25292e" />
+          <Text style={styles.submitButtonText}>Create Ad</Text>
+          <Ionicons name="checkmark-circle-outline" size={20} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -189,7 +209,7 @@ export default function PostScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#25292e",
+    backgroundColor: "#F8FAFC",
   },
   header: {
     flexDirection: "row",
@@ -197,13 +217,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 15,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#353840",
+    backgroundColor: "#FFFFFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "#ffffff",
+    fontWeight: "600",
+    color: "#1E293B",
   },
   formContainer: {
     padding: 20,
@@ -211,17 +232,19 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: "500",
-    color: "#ffffff",
+    color: "#1E293B",
     marginBottom: 8,
     marginTop: 16,
   },
   input: {
-    backgroundColor: "#353840",
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    padding: 16,
     fontSize: 16,
     marginBottom: 8,
-    borderWidth: 0,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    color: "#1E293B",
   },
   textArea: {
     height: 120,
@@ -232,15 +255,23 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   imagePickerButton: {
-    backgroundColor: "#ffd33d",
-    padding: 14,
-    borderRadius: 8,
+    backgroundColor: "#2563EB",
+    padding: 16,
+    borderRadius: 12,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#2563EB",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   buttonText: {
-    color: "#25292e",
+    color: "#FFFFFF",
     fontWeight: "600",
     fontSize: 16,
     marginLeft: 8,
@@ -248,43 +279,119 @@ const styles = StyleSheet.create({
   imagePreviewContainer: {
     marginTop: 15,
     marginBottom: 20,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  previewHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
   },
   previewText: {
-    color: "#ffffff",
     fontSize: 16,
+    fontWeight: "600",
+    color: "#1E293B",
+  },
+  addMoreButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F1F5F9",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    gap: 4,
+  },
+  addMoreText: {
+    fontSize: 14,
     fontWeight: "500",
-    marginBottom: 10,
+    color: "#2563EB",
+  },
+  imageScrollContainer: {
+    paddingRight: 16,
+    gap: 12,
   },
   imageWrapper: {
     position: "relative",
-    marginRight: 12,
-  },
-  imagePreview: {
     width: 120,
     height: 120,
-    borderRadius: 10,
+  },
+  imagePreview: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  imageOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    borderRadius: 12,
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
+    padding: 8,
   },
   removeImageButton: {
-    position: "absolute",
-    top: -10,
-    right: -10,
-    backgroundColor: "#25292e",
-    borderRadius: 15,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
     padding: 2,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  imageNumber: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  imageNumberText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "600",
   },
   submitButton: {
-    backgroundColor: "#ffd33d",
+    backgroundColor: "#2563EB",
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginTop: 20,
+    shadowColor: "#2563EB",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   submitButtonText: {
-    color: "#25292e",
-    fontWeight: "bold",
-    fontSize: 18,
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
     marginRight: 8,
   },
 });

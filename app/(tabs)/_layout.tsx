@@ -2,19 +2,37 @@ import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Provider } from "react-redux";
 import { store } from "../../store/store";
+import { Platform } from "react-native";
+
 export default function TabLayout() {
   return (
     <Provider store={store}>
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: "#ffd33d",
+          tabBarActiveTintColor: "#2563EB",
+          tabBarInactiveTintColor: "#94A3B8",
           headerStyle: {
-            backgroundColor: "#25292e",
+            backgroundColor: "#FFFFFF",
+            elevation: 0,
+            shadowOpacity: 0,
           },
           headerShadowVisible: false,
-          headerTintColor: "#fff",
+          headerTintColor: "#1E293B",
           tabBarStyle: {
-            backgroundColor: "#25292e",
+            backgroundColor: "#FFFFFF",
+            borderTopWidth: 0,
+            elevation: 0,
+            shadowOpacity: 0,
+            height: Platform.OS === "ios" ? 90 : 70,
+            paddingBottom: Platform.OS === "ios" ? 20 : 10,
+            paddingTop: 10,
+          },
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: "600",
+          },
+          tabBarItemStyle: {
+            paddingVertical: 5,
           },
         }}
       >
@@ -34,7 +52,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="post"
           options={{
-            title: "New Post",
+            title: "Create Ad",
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 name={focused ? "add-circle" : "add-circle-outline"}
@@ -47,7 +65,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="posts"
           options={{
-            title: "My Posts",
+            title: "My Ads",
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 name={focused ? "grid-sharp" : "grid-outline"}

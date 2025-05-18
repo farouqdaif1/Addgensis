@@ -142,13 +142,13 @@ export default function PostsScreen() {
               style={styles.iconButton}
               onPress={() => handleEditPost(item.id)}
             >
-              <Ionicons name="create-outline" size={22} color="#ffd33d" />
+              <Ionicons name="create-outline" size={22} color="#2563EB" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.iconButton}
               onPress={() => handleDeletePost(item.id)}
             >
-              <Ionicons name="trash-outline" size={22} color="#ff3b30" />
+              <Ionicons name="trash-outline" size={22} color="#EF4444" />
             </TouchableOpacity>
           </View>
         </View>
@@ -156,33 +156,39 @@ export default function PostsScreen() {
         {renderImageGrid(item.images)}
 
         <View style={styles.postDetails}>
-          <Text style={styles.priceTag}>${item.price.toFixed(2)}</Text>
+          <View style={styles.priceContainer}>
+            <Text style={styles.priceLabel}>Price</Text>
+            <Text style={styles.priceTag}>${item.price.toFixed(2)}</Text>
+          </View>
 
           <TouchableOpacity
             style={styles.descriptionToggle}
             onPress={() => handleToggleExpand(item.id)}
           >
             <Text style={styles.descriptionLabel}>
-              {isExpanded ? "Hide Description" : "Show Description"}
+              {isExpanded ? "Hide Details" : "Show Details"}
             </Text>
             <Ionicons
               name={isExpanded ? "chevron-up" : "chevron-down"}
               size={16}
-              color="#ffd33d"
+              color="#2563EB"
             />
           </TouchableOpacity>
         </View>
 
         {isExpanded && (
           <View style={styles.expandedContent}>
-            <Text style={styles.description}>{item.description}</Text>
+            <View style={styles.descriptionContainer}>
+              <Text style={styles.descriptionLabel}>Description</Text>
+              <Text style={styles.description}>{item.description}</Text>
+            </View>
 
             <View style={styles.buttonsContainer}>
               <TouchableOpacity
                 style={[styles.actionButton, styles.facebookButton]}
                 onPress={() => handleCreateFacebookAd(item.id)}
               >
-                <Ionicons name="logo-facebook" size={18} color="#ffffff" />
+                <Ionicons name="logo-facebook" size={18} color="#FFFFFF" />
                 <Text style={styles.buttonText}>Create Facebook Ad</Text>
               </TouchableOpacity>
 
@@ -190,7 +196,7 @@ export default function PostsScreen() {
                 style={[styles.actionButton, styles.aiButton]}
                 onPress={() => handleEnhanceWithAI(item.id)}
               >
-                <Ionicons name="flash-outline" size={18} color="#ffffff" />
+                <Ionicons name="flash-outline" size={18} color="#FFFFFF" />
                 <Text style={styles.buttonText}>Enhance with AI</Text>
               </TouchableOpacity>
             </View>
@@ -203,18 +209,29 @@ export default function PostsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>My Posts</Text>
-        <TouchableOpacity onPress={() => router.push("/(tabs)/post")}>
-          <Ionicons name="add-circle-outline" size={24} color="#ffd33d" />
+        <Text style={styles.title}>My Ads</Text>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => router.push("/(tabs)/post")}
+        >
+          <Ionicons name="add-circle-outline" size={24} color="#2563EB" />
         </TouchableOpacity>
       </View>
 
       {posts.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="images-outline" size={64} color="#aaa" />
+          <View style={styles.emptyIconContainer}>
+            <Ionicons name="megaphone-outline" size={64} color="#94A3B8" />
+          </View>
           <Text style={styles.emptyText}>
-            No posts yet. Create your first post using the camera or gallery!
+            No ads yet. Create your first ad using the camera or gallery!
           </Text>
+          <TouchableOpacity
+            style={styles.createFirstButton}
+            onPress={() => router.push("/(tabs)/post")}
+          >
+            <Text style={styles.createFirstText}>Create Your First Ad</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -223,6 +240,7 @@ export default function PostsScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
         />
       )}
 
@@ -238,7 +256,7 @@ export default function PostsScreen() {
             style={styles.closeButton}
             onPress={closeImageViewer}
           >
-            <Ionicons name="close" size={30} color="#ffffff" />
+            <Ionicons name="close" size={30} color="#FFFFFF" />
           </TouchableOpacity>
           {selectedImage && (
             <Image
@@ -256,139 +274,30 @@ export default function PostsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#25292e",
+    backgroundColor: "#F8FAFC",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "#353840",
-    backgroundColor: "#25292e",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: "#FFFFFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
   },
   title: {
     fontSize: 24,
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  listContainer: {
-    paddingBottom: 20,
-  },
-  postContainer: {
-    marginHorizontal: 12,
-    marginTop: 15,
-    marginBottom: 15,
-    backgroundColor: "#2d3035",
-    borderRadius: 12,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  postHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-  },
-  postHeaderInfo: {
-    flex: 1,
-  },
-  postHeaderActions: {
-    flexDirection: "row",
-  },
-  iconButton: {
-    padding: 6,
-    marginLeft: 8,
-  },
-  postName: {
-    fontSize: 18,
     fontWeight: "600",
-    color: "#ffffff",
+    color: "#1E293B",
   },
-  postDate: {
-    fontSize: 12,
-    color: "#aaaaaa",
-    marginTop: 4,
-  },
-  singleImage: {
-    width: "100%",
-    height: 300,
-  },
-  imageGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  gridImageContainer: {
-    width: "33.33%",
-    aspectRatio: 1,
-    padding: 1,
-  },
-  gridImage: {
-    flex: 1,
-    width: null,
-    height: null,
-  },
-  postDetails: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-  },
-  priceTag: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#2ecc71",
-  },
-  descriptionToggle: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  descriptionLabel: {
-    color: "#ffd33d",
-    marginRight: 5,
-    fontWeight: "500",
-  },
-  expandedContent: {
-    padding: 15,
-    borderTopWidth: 0.5,
-    borderTopColor: "#353840",
-  },
-  description: {
-    fontSize: 14,
-    marginBottom: 15,
-    lineHeight: 20,
-    color: "#ffffff",
-  },
-  buttonsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  actionButton: {
-    flex: 1,
-    flexDirection: "row",
+  addButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F1F5F9",
     justifyContent: "center",
     alignItems: "center",
-    padding: 12,
-    borderRadius: 6,
-    marginHorizontal: 4,
-  },
-  facebookButton: {
-    backgroundColor: "#ffd33d",
-  },
-  aiButton: {
-    backgroundColor: "#ffd33d",
-  },
-  buttonText: {
-    color: "#25292e",
-    fontWeight: "bold",
-    marginLeft: 6,
   },
   emptyContainer: {
     flex: 1,
@@ -396,28 +305,187 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
+  emptyIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#F1F5F9",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
   emptyText: {
-    marginTop: 16,
     fontSize: 16,
-    color: "#aaa",
+    color: "#64748B",
     textAlign: "center",
+    marginBottom: 20,
+  },
+  createFirstButton: {
+    backgroundColor: "#2563EB",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+  },
+  createFirstText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  listContainer: {
+    padding: 16,
+  },
+  separator: {
+    height: 16,
+  },
+  postContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  postHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  postHeaderInfo: {
+    flex: 1,
+  },
+  postName: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#1E293B",
+    marginBottom: 4,
+  },
+  postDate: {
+    fontSize: 14,
+    color: "#64748B",
+  },
+  postHeaderActions: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  iconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F1F5F9",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  singleImage: {
+    width: "100%",
+    height: 300,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  imageGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 4,
+    marginBottom: 12,
+  },
+  gridImageContainer: {
+    width: (screenWidth - 40) / 3,
+    height: (screenWidth - 40) / 3,
+  },
+  gridImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 8,
+  },
+  postDetails: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  priceContainer: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: 4,
+  },
+  priceLabel: {
+    fontSize: 14,
+    color: "#64748B",
+  },
+  priceTag: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#2563EB",
+  },
+  descriptionToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  descriptionLabel: {
+    fontSize: 14,
+    color: "#2563EB",
+    fontWeight: "500",
+  },
+  expandedContent: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#E2E8F0",
+  },
+  descriptionContainer: {
+    marginBottom: 16,
+  },
+  description: {
+    fontSize: 16,
+    color: "#475569",
+    lineHeight: 24,
+    marginTop: 4,
+  },
+  buttonsContainer: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  actionButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    gap: 8,
+  },
+  facebookButton: {
+    backgroundColor: "#1877F2",
+  },
+  aiButton: {
+    backgroundColor: "#2563EB",
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "600",
   },
   imageViewerContainer: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.95)",
+    backgroundColor: "rgba(0, 0, 0, 0.9)",
     justifyContent: "center",
-  },
-  fullScreenImage: {
-    width: "100%",
-    height: "80%",
+    alignItems: "center",
   },
   closeButton: {
     position: "absolute",
     top: 40,
     right: 20,
-    zIndex: 10,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    borderRadius: 20,
-    padding: 5,
+    zIndex: 1,
+  },
+  fullScreenImage: {
+    width: "100%",
+    height: "100%",
   },
 });
